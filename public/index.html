@@ -234,9 +234,77 @@
   // Tilt group holds the axial tilt; planet spins around its local Y
   // axis inside the tilt group, so sidereal rotation is correct.
   var tiltGroup = new THREE.Group();
-  tiltGroup.rotation.z = 1.706408; // 97.77 deg axial tilt
+  tiltGroup.rotation.z = 1.706408; // 97.77 deg axial tilt (Uranus rolls on its side)
   scene.add(tiltGroup);
   tiltGroup.add(planet);
+
+  // ═══ URANUS MAJOR MOONS (5 spherical moons via Kepler) ═══
+  // Scene scale: Uranus radius 1.5 = 25362 km real, so 1 unit = 16,908 km.
+  var SCENE_UNIT_KM = 25362 / 1.5;
+  var URANUS_MOONS = [
+    { name: 'Miranda',  a_km: 129900, e: 0.0013, period_days: 1.413,  color: 0xc8c0b8, radius: 0.03 },
+    { name: 'Ariel',    a_km: 190900, e: 0.0012, period_days: 2.520,  color: 0xd0c8c0, radius: 0.05 },
+    { name: 'Umbriel',  a_km: 266000, e: 0.0039, period_days: 4.144,  color: 0x908878, radius: 0.05 },
+    { name: 'Titania',  a_km: 436300, e: 0.0011, period_days: 8.706,  color: 0xc0b8a8, radius: 0.06 },
+    { name: 'Oberon',   a_km: 583500, e: 0.0014, period_days: 13.463, color: 0xb0a898, radius: 0.06 },
+  ];
+  var moonMeshes = [];
+  URANUS_MOONS.forEach(function(m) {
+    m.a = m.a_km / SCENE_UNIT_KM;
+    m.period = m.period_days * 86400;
+    var mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(m.radius, 20, 14),
+      new THREE.MeshStandardMaterial({ color: m.color, roughness: 0.85 })
+    );
+    tiltGroup.add(mesh);
+    m.mesh = mesh;
+    moonMeshes.push(m);
+    var pts = [];
+    for (var k = 0; k <= 128; k++) {
+      var th = (k / 128) * Math.PI * 2;
+      pts.push(new THREE.Vector3(m.a * Math.cos(th), 0, m.a * Math.sin(th)));
+    }
+    tiltGroup.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineBasicMaterial({ color: m.color, transparent: true, opacity: 0.3 })
+    ));
+  });
+
+  // Faint ring system (13 narrow rings, we render the Epsilon ring approximately)
+  (function rings() {
+    var epsilon_a = 51149 / (25362 / 1.5);  // 3.025 units
+    var ringGeo = new THREE.RingGeometry(epsilon_a - 0.02, epsilon_a + 0.02, 96);
+    var ringMat = new THREE.MeshBasicMaterial({
+      color: 0x888080, side: THREE.DoubleSide, transparent: true, opacity: 0.4,
+    });
+    var ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = -Math.PI / 2;
+    tiltGroup.add(ring);
+  })();
+
+  function solveKepler(M, e) {
+    var E = M;
+    for (var i = 0; i < 12; i++) {
+      var f = E - e * Math.sin(E) - M;
+      var fp = 1 - e * Math.cos(E);
+      E -= f / fp;
+    }
+    return E;
+  }
+
+  var SCENE_EPOCH_SEC = Date.now() / 1000;
+  function updateMoons() {
+    var TIME_SCALE = 1500;
+    var simTime = (Date.now() / 1000 - SCENE_EPOCH_SEC) * TIME_SCALE;
+    moonMeshes.forEach(function(m) {
+      var n = (Math.PI * 2) / m.period;
+      var M = (n * simTime) % (Math.PI * 2);
+      var E = solveKepler(M, m.e);
+      var nu = 2 * Math.atan2(Math.sqrt(1 + m.e) * Math.sin(E/2), Math.sqrt(1 - m.e) * Math.cos(E/2));
+      var r = m.a * (1 - m.e * Math.cos(E));
+      m.mesh.position.set(r * Math.cos(nu), 0, r * Math.sin(nu));
+    });
+  }
 
   // Subtle starfield
   (function stars() {
@@ -256,12 +324,14 @@
     scene.add(new THREE.Points(geo, mat));
   })();
 
+  camera.position.set(0, 15, 60);
+
   // Controls
   var controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.minDistance = 2.2;
-  controls.maxDistance = 40;
+  controls.maxDistance = 300;
 
   // Resize
   window.addEventListener('resize', function () {
@@ -274,6 +344,7 @@
   function tick() {
     requestAnimationFrame(tick);
     planet.rotation.y += -0.001439;
+    updateMoons();
     controls.update();
     renderer.render(scene, camera);
   }
