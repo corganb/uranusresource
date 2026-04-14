@@ -299,7 +299,7 @@
 
   var SCENE_EPOCH_SEC = Date.now() / 1000;
   function updateMoons() {
-    var TIME_SCALE = 1500;
+    var TIME_SCALE = 300;
     var simTime = (Date.now() / 1000 - SCENE_EPOCH_SEC) * TIME_SCALE;
     moonMeshes.forEach(function(m) {
       var n = (Math.PI * 2) / m.period;
@@ -348,7 +348,7 @@
   // Animate
   function tick() {
     requestAnimationFrame(tick);
-    planet.rotation.y += -0.001439;
+    planet.rotation.y += -0.0005062;
     updateMoons();
     controls.update();
     renderer.render(scene, camera);
