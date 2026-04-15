@@ -278,6 +278,22 @@
   tiltGroup.add(moonsGroup);
   tiltGroup.add(moonOrbitsGroup);
 
+  function makeMoonLabel(text, hexColor) {
+    var c = document.createElement('canvas');
+    c.width = 256; c.height = 48;
+    var ctx = c.getContext('2d');
+    ctx.font = 'bold 22px -apple-system, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 4;
+    ctx.strokeText(text, 128, 24);
+    ctx.fillStyle = hexColor;
+    ctx.fillText(text, 128, 24);
+    var tex = new THREE.CanvasTexture(c);
+    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false }));
+    sp.scale.set(0.55, 0.1, 1);
+    return sp;
+  }
+
   var moonMeshes = [];
   URANUS_MOONS.forEach(function(m) {
     m.a = m.a_km / SCENE_UNIT_KM;
@@ -289,6 +305,13 @@
     moonsGroup.add(mesh);
     m.mesh = mesh;
     moonMeshes.push(m);
+
+    var hex = '#' + m.color.toString(16).padStart(6, '0');
+    var label = makeMoonLabel(m.name, hex);
+    label.position.set(0, m.radius + 0.08, 0);
+    mesh.add(label);
+    m.label = label;
+
     var pts = [];
     for (var k = 0; k <= 128; k++) {
       var th = (k / 128) * Math.PI * 2;
