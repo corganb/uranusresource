@@ -124,6 +124,16 @@
 
   /* Toast */
   #rs-toast { position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%); z-index: 300; background: rgba(14,16,20,0.92); backdrop-filter: blur(12px); border: 1px solid var(--b2); border-radius: 8px; padding: 8px 18px; font-size: 12px; color: var(--t1); pointer-events: none; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+
+  /* Interactive layer list (shared pattern across all planet sites) */
+  .ly-item { display: flex; gap: 8px; align-items: flex-start; padding: 6px 4px; border-bottom: 1px dashed rgba(255,255,255,0.04); cursor: pointer; user-select: none; }
+  .ly-item:hover { background: rgba(255,255,255,0.02); }
+  .ly-check { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--b2); flex-shrink: 0; margin-top: 2px; background: transparent; cursor: pointer; position: relative; }
+  .ly-check.on { background: var(--accent); border-color: var(--accent); }
+  .ly-check.on::after { content: ''; position: absolute; left: 3px; top: 0px; width: 5px; height: 9px; border: solid #000; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .ly-body { flex: 1; min-width: 0; }
+  .ly-name { font-size: 11.5px; color: var(--t2); font-weight: 500; }
+  .ly-desc { font-size: 9.5px; color: var(--t4); margin-top: 2px; line-height: 1.35; }
 </style>
 </head>
 <body>
@@ -160,14 +170,8 @@
     <div class="info-row"><span>Sidereal day</span><span>17h 14m retrograde</span></div>
     <div class="info-row"><span>Dist. from Sun</span><span>2.87 B km (19.20 AU)</span></div>
 
-    <h3>Scientific Layers</h3>
-    <div class="info-row"><span>Uranus surface</span><span style="font-size:9.5px;text-align:right">2K Voyager 2 ISS (best available)</span></div>
-    <div class="info-row"><span>Miranda</span><span style="font-size:9.5px;text-align:right">Extreme terrain, 1.413-day orbit</span></div>
-    <div class="info-row"><span>Ariel</span><span style="font-size:9.5px;text-align:right">2.520-day orbit</span></div>
-    <div class="info-row"><span>Umbriel</span><span style="font-size:9.5px;text-align:right">4.144-day orbit</span></div>
-    <div class="info-row"><span>Titania</span><span style="font-size:9.5px;text-align:right">Largest moon, 8.706-day orbit</span></div>
-    <div class="info-row"><span>Oberon</span><span style="font-size:9.5px;text-align:right">13.463-day orbit</span></div>
-    <div class="info-row"><span>Epsilon ring</span><span style="font-size:9.5px;text-align:right">Brightest of 13 rings, ~51,149 km</span></div>
+    <h3>Layers</h3>
+    <div id="layer-list"></div>
 
 
     <h3>Resource Systems</h3>
@@ -190,7 +194,7 @@
   <div class="statusbar-cell"><span class="label">FRAME</span><span class="value">Body-Fixed</span></div>
   <div class="statusbar-cell"><span class="label">BODY</span><span class="value">Uranus</span></div>
   <div class="sb-cells-right">
-    <div class="statusbar-cell"><span class="label">VERSION</span><span class="value">v0.1</span></div>
+    <div class="statusbar-cell"><span class="label">VERSION</span><span class="value">v0.2</span></div>
   </div>
 </div>
 
@@ -253,6 +257,13 @@
     { name: 'Titania',  a_km: 436300, e: 0.0011, period_days: 8.706,  color: 0xc0b8a8, radius: 0.06 },
     { name: 'Oberon',   a_km: 583500, e: 0.0014, period_days: 13.463, color: 0xb0a898, radius: 0.06 },
   ];
+  // Moons and their orbit polylines live in two sibling groups so the
+  // sidebar can toggle meshes and orbit lines independently.
+  var moonsGroup = new THREE.Group();
+  var moonOrbitsGroup = new THREE.Group();
+  tiltGroup.add(moonsGroup);
+  tiltGroup.add(moonOrbitsGroup);
+
   var moonMeshes = [];
   URANUS_MOONS.forEach(function(m) {
     m.a = m.a_km / SCENE_UNIT_KM;
@@ -261,7 +272,7 @@
       new THREE.SphereGeometry(m.radius, 20, 14),
       new THREE.MeshStandardMaterial({ color: m.color, roughness: 0.85 })
     );
-    tiltGroup.add(mesh);
+    moonsGroup.add(mesh);
     m.mesh = mesh;
     moonMeshes.push(m);
     var pts = [];
@@ -269,22 +280,25 @@
       var th = (k / 128) * Math.PI * 2;
       pts.push(new THREE.Vector3(m.a * Math.cos(th), 0, m.a * Math.sin(th)));
     }
-    tiltGroup.add(new THREE.Line(
+    moonOrbitsGroup.add(new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(pts),
       new THREE.LineBasicMaterial({ color: m.color, transparent: true, opacity: 0.3 })
     ));
   });
 
-  // Faint ring system (13 narrow rings, we render the Epsilon ring approximately)
+  // Faint ring system. Epsilon is the brightest of the 13 narrow rings
+  // (a ~ 51,149 km). Kept in its own group so it can be toggled.
+  var ringsGroup = new THREE.Group();
+  tiltGroup.add(ringsGroup);
   (function rings() {
-    var epsilon_a = 51149 / (25362 / 1.5);  // 3.025 units
+    var epsilon_a = 51149 / (25362 / 1.5);
     var ringGeo = new THREE.RingGeometry(epsilon_a - 0.02, epsilon_a + 0.02, 96);
     var ringMat = new THREE.MeshBasicMaterial({
       color: 0x888080, side: THREE.DoubleSide, transparent: true, opacity: 0.4,
     });
     var ring = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = -Math.PI / 2;
-    tiltGroup.add(ring);
+    ringsGroup.add(ring);
   })();
 
   function solveKepler(M, e) {
@@ -396,6 +410,7 @@
   })();
 
   // Subtle starfield
+  var starfield;
   (function stars() {
     var geo = new THREE.BufferGeometry();
     var count = 3000;
@@ -410,7 +425,8 @@
     }
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     var mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.8, sizeAttenuation: false, transparent: true, opacity: 0.8 });
-    scene.add(new THREE.Points(geo, mat));
+    starfield = new THREE.Points(geo, mat);
+    scene.add(starfield);
   })();
 
   camera.position.set(0, 1.2, 4);
@@ -438,6 +454,52 @@
     renderer.render(scene, camera);
   }
   tick();
+
+  // ═══ INTERACTIVE LAYER LIST ═══
+  var LAYERS = [
+    { id: 'surface', name: 'Uranus surface', desc: '2K Voyager 2 ISS archive', visible: true },
+    { id: 'moons',   name: 'Major moons',   desc: 'Miranda, Ariel, Umbriel, Titania, Oberon', visible: true },
+    { id: 'orbits',  name: 'Moon orbits',   desc: 'Circular Keplerian approximations', visible: true },
+    { id: 'rings',   name: 'Epsilon ring',  desc: 'Brightest of 13 Uranian rings', visible: true },
+    { id: 'context', name: 'Solar System context', desc: 'Directions to each major body', visible: true },
+    { id: 'stars',   name: 'Starfield',     desc: 'Procedural background stars', visible: true },
+  ];
+
+  function setLayerVisible(id, on) {
+    var l = LAYERS.find(function(x) { return x.id === id; });
+    if (!l) return;
+    l.visible = on;
+    switch (id) {
+      case 'surface': planet.visible = on; break;
+      case 'moons':   moonsGroup.visible = on; break;
+      case 'orbits':  moonOrbitsGroup.visible = on; break;
+      case 'rings':   ringsGroup.visible = on; break;
+      case 'context': if (solarSystemGroup) solarSystemGroup.visible = on; break;
+      case 'stars':   if (starfield) starfield.visible = on; break;
+    }
+    renderLayerList();
+  }
+
+  function renderLayerList() {
+    var list = document.getElementById('layer-list');
+    if (!list) return;
+    var html = '';
+    LAYERS.forEach(function(l) {
+      html += '<div class="ly-item" data-layer="' + l.id + '">' +
+              '<div class="ly-check ' + (l.visible ? 'on' : '') + '"></div>' +
+              '<div class="ly-body"><div class="ly-name">' + l.name + '</div><div class="ly-desc">' + l.desc + '</div></div>' +
+              '</div>';
+    });
+    list.innerHTML = html;
+    list.querySelectorAll('.ly-item').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var id = el.getAttribute('data-layer');
+        var l = LAYERS.find(function(x) { return x.id === id; });
+        if (l) setLayerVisible(id, !l.visible);
+      });
+    });
+  }
+  renderLayerList();
 
 })();
 
