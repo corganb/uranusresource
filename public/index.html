@@ -313,6 +313,16 @@
     moonsGroup.add(mesh);
     m.mesh = mesh;
     moonMeshes.push(m);
+    var URANUS_MOON_DATA = {
+      Miranda:  { type: 'Major moon', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/PIA18185_Miranda%27s_Icy_Face.jpg/220px-PIA18185_Miranda%27s_Icy_Face.jpg', desc: 'Extreme terrain including Verona Rupes, the tallest known cliff in the Solar System (~20 km). Patchwork surface suggests past disruption and reassembly.', fields: [{label:'Radius',value:'236 km'},{label:'Orbit',value:'129,900 km'},{label:'Period',value:'1.41 days'}] },
+      Ariel:    { type: 'Major moon', desc: 'Brightest and possibly youngest surface among Uranian moons. Extensive canyon systems and smooth plains from past cryovolcanism.', fields: [{label:'Radius',value:'579 km'},{label:'Orbit',value:'190,900 km'},{label:'Period',value:'2.52 days'}] },
+      Umbriel:  { type: 'Major moon', desc: 'Darkest of the major Uranian moons. Ancient heavily cratered surface. Bright ring feature (Wunda crater) near the equator.', fields: [{label:'Radius',value:'585 km'},{label:'Orbit',value:'266,000 km'},{label:'Period',value:'4.14 days'}] },
+      Titania:  { type: 'Major moon', desc: 'Largest moon of Uranus. Enormous canyon (Messina Chasma, 1,500 km long). May have a thin CO2 atmosphere.', fields: [{label:'Radius',value:'789 km'},{label:'Orbit',value:'436,300 km'},{label:'Period',value:'8.71 days'}] },
+      Oberon:   { type: 'Major moon', desc: 'Second largest and outermost major moon. Heavily cratered with dark material on crater floors. Mountain ~11 km tall on the limb.', fields: [{label:'Radius',value:'761 km'},{label:'Orbit',value:'583,500 km'},{label:'Period',value:'13.46 days'}] },
+    };
+    var ud = URANUS_MOON_DATA[m.name];
+    if (ud) mesh.userData = { _analysis: { name: m.name, type: ud.type, image: ud.image, desc: ud.desc, fields: ud.fields, icon: '\uD83C\uDF15' } };
+
 
     var hex = '#' + m.color.toString(16).padStart(6, '0');
     var label = makeMoonLabel(m.name, hex);
