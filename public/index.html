@@ -217,7 +217,7 @@
 <!-- Three.js (via jsdelivr UMD) -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
-<script src="resource-systems-core.js?v=14"></script>
+<script src="resource-systems-core.js?v=15"></script>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
@@ -260,6 +260,14 @@
   tiltGroup.rotation.z = 1.706408; // 97.77 deg axial tilt (Uranus rolls on its side)
   scene.add(tiltGroup);
   tiltGroup.add(planet);
+
+  planet.userData = { _analysis: {
+    name: 'Uranus', type: 'Ice giant planet',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Uranus2.jpg/220px-Uranus2.jpg',
+    desc: 'Unique 97.77 degree axial tilt makes it roll on its side. Discovered 1781 by William Herschel. Blue-green color from methane in the atmosphere. Only visited by Voyager 2 in 1986.',
+    fields: [{label:'Radius',value:'25,362 km'},{label:'Mass',value:'8.681 x 10\u00B2\u2075 kg'},{label:'Moons',value:'28 known'},{label:'Axial tilt',value:'97.77 deg'},{label:'Orbital period',value:'84.01 years'},{label:'Sidereal day',value:'17h 14m (retrograde)'}],
+  }};
+
 
   // ═══ URANUS MAJOR MOONS (5 spherical moons via Kepler) ═══
   // Scene scale: Uranus radius 1.5 = 25362 km real, so 1 unit = 16,908 km.
@@ -570,6 +578,41 @@
     });
   })();
 
+
+
+  // ═══ ANALYSIS PANEL CLICK HANDLER ═══
+  (function wireAnalysis() {
+    var rc = new THREE.Raycaster();
+    var mouse = new THREE.Vector2();
+    canvas.addEventListener('click', function(ev) {
+      if (!window.RS || !RS.showAnalysisPanel) return;
+      var rect = canvas.getBoundingClientRect();
+      mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+      rc.setFromCamera(mouse, camera);
+      var targets = [];
+      // Collect all meshes in tiltGroup (moons, spacecraft, markers)
+      tiltGroup.traverse(function(obj) {
+        if (obj.isMesh && obj.userData && obj.userData._analysis) targets.push(obj);
+      });
+      // Also check planet itself
+      if (planet && planet.userData && planet.userData._analysis) targets.push(planet);
+      // Check scene-level groups
+      scene.traverse(function(obj) {
+        if (obj.isMesh && obj.userData && obj.userData._analysis && targets.indexOf(obj) === -1) targets.push(obj);
+      });
+      var hits = rc.intersectObjects(targets, true);
+      if (!hits.length) return;
+      var obj = hits[0].object;
+      for (var i = 0; i < 5; i++) {
+        if (obj.userData && obj.userData._analysis) break;
+        if (obj.parent) obj = obj.parent; else break;
+      }
+      if (obj.userData && obj.userData._analysis) {
+        RS.showAnalysisPanel(obj.userData._analysis);
+      }
+    });
+  })();
 
   // ═══ RESET VIEW BUTTON ═══
   // Captures the initial camera position/target and resets to it on click.
