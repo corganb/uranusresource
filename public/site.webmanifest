@@ -1,0 +1,29 @@
+{
+  "name": "UranusResource",
+  "short_name": "Uranus",
+  "description": "UranusResource by Corgan Studio",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#7fd1d3",
+  "background_color": "#051f20",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
