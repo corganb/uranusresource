@@ -280,12 +280,13 @@
   // ═══ URANUS MAJOR MOONS (5 spherical moons via Kepler) ═══
   // Scene scale: Uranus radius 1.5 = 25362 km real, so 1 unit = 16,908 km.
   var SCENE_UNIT_KM = 25362 / 1.5;
+  var URANUS_TILT_RAD = 1.706408; // 97.77 deg, matches tiltGroup.rotation.z
   var URANUS_MOONS = [
-    { name: 'Miranda',  a_km: 129900, e: 0.0013, period_days: 1.413,  color: 0xc8c0b8, radius: 0.03 },
-    { name: 'Ariel',    a_km: 190900, e: 0.0012, period_days: 2.520,  color: 0xd0c8c0, radius: 0.05 },
-    { name: 'Umbriel',  a_km: 266000, e: 0.0039, period_days: 4.144,  color: 0x908878, radius: 0.05 },
-    { name: 'Titania',  a_km: 436300, e: 0.0011, period_days: 8.706,  color: 0xc0b8a8, radius: 0.06 },
-    { name: 'Oberon',   a_km: 583500, e: 0.0014, period_days: 13.463, color: 0xb0a898, radius: 0.06 },
+    { name: 'Miranda',  slug: 'miranda',  a_km: 129900, e: 0.0013, period_days: 1.413,  color: 0xc8c0b8, radius: 0.03 },
+    { name: 'Ariel',    slug: 'ariel',    a_km: 190900, e: 0.0012, period_days: 2.520,  color: 0xd0c8c0, radius: 0.05 },
+    { name: 'Umbriel',  slug: 'umbriel',  a_km: 266000, e: 0.0039, period_days: 4.144,  color: 0x908878, radius: 0.05 },
+    { name: 'Titania',  slug: 'titania',  a_km: 436300, e: 0.0011, period_days: 8.706,  color: 0xc0b8a8, radius: 0.06 },
+    { name: 'Oberon',   slug: 'oberon',   a_km: 583500, e: 0.0014, period_days: 13.463, color: 0xb0a898, radius: 0.06 },
   ];
   // Moons and their orbit polylines live in two sibling groups so the
   // sidebar can toggle meshes and orbit lines independently.
@@ -347,7 +348,40 @@
       new THREE.BufferGeometry().setFromPoints(pts),
       new THREE.LineBasicMaterial({ color: m.color, transparent: true, opacity: 0.3 })
     ));
+    m.phase = 0;
   });
+
+  // ═══ REAL MOON POSITIONS (JPL Horizons via Supabase edge fn) ═══
+  (function fetchMoonPositions() {
+    var FN_BASE = 'https://pxocavaczfjcpvqeiznt.supabase.co/functions/v1/horizons-ephemeris';
+    var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4b2NhdmFjemZqY3B2cWVpem50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NDA3MDcsImV4cCI6MjA5MDExNjcwN30.48A2xW4YoGCESsVurxmW3MP9x_lq2AJ8XeS8nR2RVGI';
+    var ca = Math.cos(URANUS_TILT_RAD), sa = Math.sin(URANUS_TILT_RAD);
+    moonMeshes.forEach(function(m) {
+      if (!m.slug) return;
+      fetch(FN_BASE + '?id=' + m.slug + '&center=' + encodeURIComponent('@uranus'), {
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
+      })
+      .then(function(r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function(data) {
+        if (!data || !isFinite(data.x_km)) return;
+        var wx = data.x_km / SCENE_UNIT_KM;
+        var wy = data.z_km / SCENE_UNIT_KM;
+        var wz = -data.y_km / SCENE_UNIT_KM;
+        var lx = wx * ca + wy * sa;
+        var lz = wz;
+        var theta = Math.atan2(lz, lx);
+        var E = 2 * Math.atan(Math.sqrt((1 - m.e) / (1 + m.e)) * Math.tan(theta / 2));
+        var M = E - m.e * Math.sin(E);
+        var simAtAnchor = (window.__rs_sim_time || 0);
+        var n = (Math.PI * 2) / m.period;
+        m.phase = M - n * simAtAnchor;
+        m.real_xyz = { x: lx, y: 0, z: lz, epoch_cal: data.epoch_cal };
+      })
+      .catch(function(err) {
+        if (window.console) console.warn('[horizons] ' + m.name + ': ' + err.message);
+      });
+    });
+  })();
 
   // Faint ring system. Epsilon is the brightest of the 13 narrow rings
   // (a ~ 51,149 km). Kept in its own group so it can be toggled.
@@ -385,7 +419,7 @@
     var simTime = __rs_sim_time;
     moonMeshes.forEach(function(m) {
       var n = (Math.PI * 2) / m.period;
-      var M = (n * simTime) % (Math.PI * 2);
+      var M = ((m.phase || 0) + n * simTime) % (Math.PI * 2);
       var E = solveKepler(M, m.e);
       var nu = 2 * Math.atan2(Math.sqrt(1 + m.e) * Math.sin(E/2), Math.sqrt(1 - m.e) * Math.cos(E/2));
       var r = m.a * (1 - m.e * Math.cos(E));
