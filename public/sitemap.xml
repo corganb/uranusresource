@@ -4,5 +4,22 @@
   <url><loc>https://uranusresource.net/faq</loc><lastmod>2026-04-24</lastmod></url>
   <url><loc>https://uranusresource.net/privacy</loc><lastmod>2026-04-24</lastmod></url>
   <url><loc>https://uranusresource.net/terms</loc><lastmod>2026-04-24</lastmod></url>
-  <url><loc>https://uranusresource.net/wiki</loc><lastmod>2026-04-24</lastmod></url>
+  <url>
+    <loc>https://uranusresource.net/research</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://uranusresource.net/research/uranus-magnetic-field-tilt</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uranusresource.net/research/uranus-interior-models</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
