@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposed flagship Uranus orbiter mission science | UranusResource Research Archive</title>
+<meta name="description" content="Review of the proposed flagship-class Uranus orbiter mission, the science objectives identified in the 2023 Decadal Survey, the trajectory and arrival options through 2045, and the comparison to the Cassini-Saturn-system mission template.">
+<link rel="canonical" href="/research/uranus-flagship-mission">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="Proposed flagship Uranus orbiter mission science">
+<meta property="og:description" content="Review of the proposed flagship-class Uranus orbiter mission, the science objectives identified in the 2023 Decadal Survey, the trajectory and arrival options through 2045, and the comparison to the Cassini-Saturn-system mission template.">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2026-04-28">
+<meta property="article:author" content="Corgan Studio, Inc.">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0c10; color: rgba(245,248,255,0.95); font-family: 'JetBrains Mono', 'SF Mono', monospace; line-height: 1.7; }
+  .container { max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
+  .back { display: inline-block; color: #7ec8d4; text-decoration: none; font-size: 12px; letter-spacing: 0.05em; margin-bottom: 32px; opacity: 0.7; }
+  .back:hover { opacity: 1; }
+  h1 { font-size: 28px; font-weight: 600; margin-bottom: 10px; color: #7ec8d4; line-height: 1.25; }
+  .abstract { font-size: 14px; color: rgba(200,210,230,0.85); margin-bottom: 16px; max-width: 700px; }
+  .meta { font-size: 11px; color: rgba(160,172,200,0.55); letter-spacing: 0.04em; margin-bottom: 36px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  article h2 { font-size: 13px; font-weight: 600; color: #7ec8d4; margin: 32px 0 12px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+  article p { font-size: 14px; color: rgba(220,228,242,0.9); margin-bottom: 14px; }
+  article p strong { color: rgba(245,248,255,1); }
+  .refs { margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .refs h2 { font-size: 12px; font-weight: 600; color: rgba(180,192,210,0.85); margin-bottom: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .refs ol { list-style: decimal; padding-left: 24px; font-size: 12px; color: rgba(180,192,210,0.78); }
+  .refs li { margin-bottom: 8px; line-height: 1.5; }
+  .refs a { color: rgba(180,210,255,0.85); text-decoration: none; word-break: break-all; }
+  .refs a:hover { color: #7ec8d4; }
+  .tier-note { margin-top: 32px; padding: 14px 16px; border-radius: 4px; background: rgba(80,140,220,0.08); border: 1px solid rgba(80,140,220,0.30); color: rgba(200,220,245,0.9); font-size: 12px; line-height: 1.6; }
+  .tier-note strong { color: #7eb6ff; }
+  .tier-note .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(80,140,220,0.15); border: 1px solid rgba(80,140,220,0.4); color: #7eb6ff; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-right: 8px; vertical-align: middle; }
+  .tier-note a { color: #7eb6ff; }
+  .footer { margin-top: 48px; font-size: 11px; color: rgba(130,145,175,0.5); display: flex; gap: 16px; flex-wrap: wrap; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .footer a { color: rgba(160,172,200,0.65); text-decoration: none; }
+  .footer a:hover { color: rgba(200,210,230,0.9); }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="/research" class="back">&larr; Research Archive</a>
+  <h1>Proposed flagship Uranus orbiter mission science</h1>
+  <div class="abstract">Review of the proposed flagship-class Uranus orbiter mission, the science objectives identified in the 2023 Decadal Survey, the trajectory and arrival options through 2045, and the comparison to the Cassini-Saturn-system mission template.</div>
+  <div class="meta">2026-04-28 &middot; 6 min read &middot; Reviewed by Corgan Studio, Inc.</div>
+
+  <article>
+
+    <h2>Introduction</h2>
+    <p>The 2023 Planetary Science and Astrobiology Decadal Survey identified a Uranus orbiter as the highest-priority new flagship-class mission for the 2023-2032 decade. Uranus has been visited only once (Voyager 2 flyby in 1986) and has substantial unanswered questions about its interior, magnetosphere, atmosphere, ring system, and 27-moon system. The Decadal recommendation, if implemented, would lead to a launch in the early 2030s with arrival in the early-to-mid 2040s. This report reviews the mission concept, science objectives, and architectural options.</p>
+
+    <h2>Science objectives</h2>
+    <p>The Decadal Survey identified four primary science objectives:</p>
+    <p><strong>Atmosphere and interior.</strong> Determine the composition, dynamics, and internal structure of Uranus, including the bulk water-ammonia-methane "ices" composition and the deep convection patterns. Constrain Uranus's formation history through atmospheric noble-gas measurement.</p>
+    <p><strong>Magnetosphere.</strong> Characterise the offset and tilted Uranus magnetic field (offset from centre by 0.3 Uranus radii, tilted 60 degrees from the rotation axis) and its interaction with the solar wind. Investigate the role of the unusual magnetic-field geometry in determining the magnetospheric structure.</p>
+    <p><strong>Ring system.</strong> Characterise the Uranian ring composition, structure, and dynamics at the spatial resolution achieved by Cassini at Saturn. Identify additional shepherd moons and resolve the dust-particle populations.</p>
+    <p><strong>Moon system.</strong> Investigate the five major moons (Miranda, Ariel, Umbriel, Titania, Oberon) and the smaller moons. Determine whether Miranda has been the site of recent geological activity (consistent with Voyager imagery showing extensive resurfacing) and whether any of the moons harbour subsurface oceans.</p>
+
+    <h2>Mission architecture options</h2>
+    <p>The Decadal Survey study considered three architecture classes:</p>
+    <p><strong>Orbiter only.</strong> A solo orbiter would conduct multi-year in-orbit science with periodic moon flybys. This is the simplest architecture and the most-mature.</p>
+    <p><strong>Orbiter plus atmospheric probe.</strong> Adding a Galileo-class atmospheric descent probe would provide the first direct in-situ measurement of Uranus atmospheric composition and structure. The probe is a high-value addition but adds substantial mission cost and complexity.</p>
+    <p><strong>Orbiter plus probe plus moon-targeted instrumentation.</strong> A more ambitious architecture would add specialised instrumentation for the icy-moon-ocean question, particularly for Miranda. This is the most scientifically-rich option but the most challenging to fund.</p>
+    <p>The Decadal recommended architecture includes a probe; final selection awaits NASA Science Mission Directorate refinement.</p>
+
+    <h2>Trajectory options</h2>
+    <p>The trajectory to Uranus is constrained by orbital mechanics: Jupiter gravity assist is the primary fuel-efficient route, requiring a launch window aligned with Jupiter's orbital position. Available windows in the 2030s are 2031-2032 (with arrival in 2042-2044), 2034-2035 (arrival in 2045-2046), and a less-favourable 2036-2037. The 2031-2032 window is the most-frequently-cited target in mission planning. A Saturn gravity-assist option is also available but adds approximately one year to cruise time.</p>
+
+    <h2>Power and propulsion</h2>
+    <p>Uranus's distance from the Sun (approximately 19 AU at the planet) places solar power below the operational threshold for a science orbiter; radioisotope power systems (RPS) are required. The mission would consume a substantial fraction of NASA's available Pu-238 inventory, requiring continued investment in the Pu-238 production restart programme. Cruise propulsion is likely to be solar-electric augmented by chemical for Jupiter flyby and Uranus orbit insertion.</p>
+
+    <h2>Comparison to Cassini-at-Saturn template</h2>
+    <p>The proposed Uranus mission would follow approximately the Cassini-at-Saturn template but at a smaller scale. Cassini was a flagship-class mission with a 13-year orbital phase, comprehensive instrument suite, and a partner agency (ESA, with Huygens probe to Titan). The Uranus mission as currently scoped is somewhat smaller in instrument suite and orbital duration but ambitious for the Decadal Survey timeframe. The European Space Agency has expressed interest in partnership; final partnership terms await NASA mission Authority To Proceed and the ESA Cosmic Vision selection cycle.</p>
+
+    <h2>Outlook</h2>
+    <p>The Uranus orbiter is in the pre-formulation phase as of 2026. NASA's 2024 budget includes initial study funding; mission Authority To Proceed is targeted for late 2026 or 2027. Major architectural decisions (probe inclusion, partnership structure, instrument selection) are under review. The 2031-2032 launch window represents an opportunity that, if missed, defers the mission by approximately 14-15 years (to the 2046 next-favourable window). The mission's strategic importance is therefore tied to maintaining schedule discipline through the development phase.</p>
+  </article>
+
+  <div class="refs">
+    <h2>References</h2>
+    <ol>
+      <li><a href="https://www.nationalacademies.org/our-work/planetary-science-and-astrobiology-decadal-survey-2023-2032" target="_blank" rel="noopener">Decadal Survey: Origins, Worlds, and Life (2023)</a></li>
+      <li><a href="https://www.lpi.usra.edu/opag/" target="_blank" rel="noopener">NASA Outer Planets Assessment Group</a></li>
+      <li><a href="https://voyager.jpl.nasa.gov/mission/" target="_blank" rel="noopener">NASA Voyager 2 Uranus encounter</a></li>
+      <li><a href="https://www.nasa.gov/directorates/spacetech/programs/space_technology_research_and_development/" target="_blank" rel="noopener">NASA Plutonium-238 Production Restart</a></li>
+    </ol>
+  </div>
+
+  <div class="tier-note"><span class="pill">Researcher</span><strong>Citation exports.</strong> This article is open and free to read. Researcher tier subscribers can download a citation-ready PDF (with formatted bibliography), BibTeX entry, and persistent article identifier for use in published work. <a href="/">See plans</a>.</div>
+
+  <div class="footer">
+    <a href="/">Home</a>
+    <a href="/research">Research Archive</a>
+    <a href="/faq">FAQ</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+  </div>
+</div>
+</body>
+</html>
